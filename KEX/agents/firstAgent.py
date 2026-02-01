@@ -9,12 +9,18 @@ from CybORG.Shared.Actions import *  # type: ignore
 cyborgRoot = Path(inspect.getfile(CybORG)).parent
 path = cyborgRoot/ "Shared" / "Scenarios" / "Scenario2.yaml"   # We will only use Scenario2 (10 levels)
 
-env = CybORG(str(path), "sim")
+env = CybORG(str(path), "sim", agents={"Red": B_lineAgent}) 
 
-results = env.reset(agent="Red")
+# Reset environment, get inital observation (Blue)
+results = env.reset(agent="Blue")
 obs = results.observation
-#pprint(obs)
+actionSpace = results.action_space
+agent = BlueReactRemoveAgent() # BlueMonitorAgent()
 
-#actionSpace = results.action_space
-#print(list(actionSpace.keys()))
-
+# Run for 20 steps
+for step in range(20):
+    action = agent.get_action(obs, action_space=actionSpace)
+    results = env.step(agent="Blue", action=action)
+    obs = results.observation
+    reward = results.reward
+    print("Step " + str(step) + ": " + str(reward))
